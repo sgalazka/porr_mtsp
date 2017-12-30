@@ -9,4 +9,5 @@ private:
 public:
 	std::vector<CityGene> getGenes();
 	SalesmanGene(std::vector<CityGene> genes);
+	void printGene();
 };

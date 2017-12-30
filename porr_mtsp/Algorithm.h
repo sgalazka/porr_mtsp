@@ -13,6 +13,7 @@ public:
 	Algorithm(int salesmen, int cities, int citiesPerSalesman);
 	void initializePopulation();
 	void executeAlgorithm();
-
+	Genotype getRandomGenotype();
+	std::string populationToString();
 };
 

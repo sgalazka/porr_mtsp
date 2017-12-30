@@ -3,7 +3,7 @@
 using namespace std;
 
 int main() {
-	Algorithm algorithm = Algorithm(1, 1, 1);
+	Algorithm algorithm = Algorithm(10, 100, 10);
 	algorithm.executeAlgorithm();
 	return 0;
 }

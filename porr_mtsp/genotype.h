@@ -8,4 +8,5 @@ private:
 public:
 	Genotype(std::vector<SalesmanGene> genes);
 	std::vector<SalesmanGene> getGenes();
+	void printGenotype();
 };
