@@ -41,5 +41,6 @@ Genotype Algorithm::getRandomGenotype() {
 
 
 void Algorithm::executeAlgorithm() {
-	cout << "executeMtspGeneticAlgorithm" << endl;
+	cout << "\n""executeMtspGeneticAlgorithm""\n" << endl;
+	
 }

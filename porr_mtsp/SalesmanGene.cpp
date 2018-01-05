@@ -10,7 +10,7 @@ std::vector<CityGene> SalesmanGene::getGenes() {
 }
 
 void SalesmanGene::printGene() {
-	std::cout << "SalesmanGene::toString" << std::endl << "[ ";
+	std::cout << "SalesmanGene::toString" << std::endl << "[\t";
 	for (std::vector<CityGene>::iterator it = genes.begin(); it != genes.end(); ++it) {
 		std::cout << it->getGenes()<< ",\t";
 	}

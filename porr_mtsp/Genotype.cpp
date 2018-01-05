@@ -10,7 +10,7 @@ std::vector<SalesmanGene> Genotype::getGenes() {
 }
 
 void Genotype::printGenotype() {
-	std::cout << "Print genotype:" << std::endl;
+	std::cout << "\n""Print genotype:""\n" << std::endl;
 	for (int i = 0; i < genes.size(); i++) {
 		std::cout << "gene: " << i; 
 		genes[i].printGene();

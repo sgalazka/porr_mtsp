@@ -146,7 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Algorithm.cpp" />
+    <ClCompile Include="CityGene.cpp" />
+    <ClCompile Include="Genotype.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="SalesmanGene.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Algorithm.h" />
+    <ClInclude Include="city_gene.h" />
+    <ClInclude Include="genotype.h" />
+    <ClInclude Include="salesman_gene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
