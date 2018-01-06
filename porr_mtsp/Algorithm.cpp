@@ -1,16 +1,15 @@
 #include "Algorithm.h"
-#include <time.h>
-#include <algorithm>
-#include <assert.h>
+
 using namespace std;
 
 Genotype getRandomGenotype();
 
-Algorithm::Algorithm(int salesmen, int cities, int citiesPerSalesman) {
+Algorithm::Algorithm(int salesmen, int cities, int citiesPerSalesman, Graph* graph) {
 	assert(salesmen * citiesPerSalesman == cities);
 	this->salesmen = salesmen;
 	this->cities = cities;
 	this->citiesPerSalesman = citiesPerSalesman;
+	this->graph = graph;
 	initializePopulation();
 }
 
@@ -42,4 +41,5 @@ Genotype Algorithm::getRandomGenotype() {
 
 void Algorithm::executeAlgorithm() {
 	cout << "executeMtspGeneticAlgorithm" << endl;
+	cout << "graph.getPathLength(1, 5)" << graph->getPathLength(1, 5) << endl;
 }
