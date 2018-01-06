@@ -4,9 +4,11 @@
 
 class Genotype {
 private:
-	std::vector<SalesmanGene> genes;
+	std::vector<CityGene> genes;
+	int citiesPerSalesman;
 public:
-	Genotype(std::vector<SalesmanGene> genes);
-	std::vector<SalesmanGene> getGenes();
+	Genotype(std::vector<CityGene> g, int citiesPerSalesman);
+	std::vector<CityGene> getAllGenes();
 	void printGenotype();
+	std::vector<CityGene> getGenesForSalesman(int id);
 };

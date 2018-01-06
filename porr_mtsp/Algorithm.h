@@ -12,13 +12,15 @@ private:
 	int salesmen;
 	int cities;
 	int citiesPerSalesman;
+	int populationSize;
 	Graph* graph;
 	std::vector<Genotype> population;
 public:
-	Algorithm(int salesmen, int cities, int citiesPerSalesman, Graph* graph);
+	Algorithm(int salesmen, int cities, int citiesPerSalesman, int populationSize, Graph* graph);
 	void initializePopulation();
 	void executeAlgorithm();
 	Genotype getRandomGenotype();
-	std::string populationToString();
+	void orderCrossover(std::vector<CityGene>* parent1, std::vector<CityGene>* parent2,
+		std::vector<CityGene>* child1, std::vector<CityGene>* child2);
 };
 
