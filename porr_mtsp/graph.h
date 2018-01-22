@@ -1,5 +1,6 @@
 #pragma once
 #include <igraph.h>
+#include <vector>
 
 class Graph {
 private:
@@ -11,5 +12,5 @@ public:
 	Graph(int noOfVertices, igraph_vector_t* edges);
 	Graph();
 	~Graph();
-	int getPathLength(int startIndex, int endIndex);
+	std::vector<int> getPath(int startIndex, int endIndex);
 };

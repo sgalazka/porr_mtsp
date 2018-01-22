@@ -10,9 +10,9 @@ int main() {
 	Graph graph, *graph1;
 	graph1 = getSimpleGraph(&graph, &edges);
 	int salesmen=2; 
-	int cities=6; 
-	int citiesPerSalesman=3;
-	int populationSize = 2;
+	int cities=10; 
+	int citiesPerSalesman=5;
+	int populationSize = 7;
 	Algorithm algorithm = Algorithm(salesmen, cities, citiesPerSalesman, populationSize, graph1);
 	algorithm.executeAlgorithm();
 

@@ -22,5 +22,9 @@ public:
 	Genotype getRandomGenotype();
 	void orderCrossover(std::vector<CityGene>* parent1, std::vector<CityGene>* parent2,
 		std::vector<CityGene>* child1, std::vector<CityGene>* child2);
+	float rateGenotype(Genotype Genotype);
+	std::vector<Genotype> getNewPopulation(std::vector<Genotype> temporaryPopulation);
+	int getRoadLengthForSalesman(std::vector<CityGene> salesman);
+	std::vector<std::pair<int, int>> getParentPairs();
 };
 

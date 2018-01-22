@@ -3,9 +3,13 @@
 #include <assert.h>
 
 using namespace std;
-Genotype::Genotype(vector<CityGene> g, int citiesPerSalesman) {
-	this->genes = g;
-	this->citiesPerSalesman = citiesPerSalesman;
+
+Genotype::Genotype() {
+
+}
+
+Genotype::Genotype(vector<CityGene> g, int citiesPerSalesman): genes(g), citiesPerSalesman(citiesPerSalesman) {
+	
 }
 
 vector<CityGene> Genotype::getAllGenes() {
@@ -13,10 +17,22 @@ vector<CityGene> Genotype::getAllGenes() {
 }
 
 vector<CityGene> Genotype::getGenesForSalesman(int id) {
-	cout << "getGenesForSalesman" << endl;
-	cout << "id: " << id << ", genes.size: " << genes.size() << ", id*citiesPerSalesman: " << id*citiesPerSalesman << endl;
+	//cout << "getGenesForSalesman" << endl;
+	//cout << "id: " << id << ", genes.size: " << genes.size() << ", id*citiesPerSalesman: " << id*citiesPerSalesman << endl;
 	assert(id * citiesPerSalesman <= genes.size());
 	return vector<CityGene>(&genes[id*citiesPerSalesman], &genes[id*citiesPerSalesman] + citiesPerSalesman);
+}
+
+void Genotype::setRate(float rate) {
+	this->rate = rate;
+}
+
+float Genotype::getRate() {
+	return this->rate;
+}
+
+bool Genotype::operator < (const Genotype& str) const {
+	return(this->rate < str.rate);
 }
 
 void Genotype::printGenotype() {
