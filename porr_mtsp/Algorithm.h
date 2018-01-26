@@ -26,5 +26,7 @@ public:
 	std::vector<Genotype> getNewPopulation(std::vector<Genotype> temporaryPopulation);
 	int getRoadLengthForSalesman(std::vector<CityGene> salesman);
 	std::vector<std::pair<int, int>> getParentPairs();
+	void makeCrossover(Genotype genotype1, Genotype genotype2);
+	std::vector<Genotype> cutPopulation(std::vector<Genotype> temporaryPopulation);
 };
 
