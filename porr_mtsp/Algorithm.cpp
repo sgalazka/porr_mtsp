@@ -1,29 +1,34 @@
 #include "Algorithm.h"
 #include <mpi.h>
+#include <math.h>
 #define MAX_PROCESSES 20
 
 using namespace std;
 
 bool vectorContains(vector<CityGene> vec, CityGene value);
+bool vectorContains(vector<Genotype> vec, Genotype value);
 void printGenes(vector<CityGene> genes, int citiesPerSalesman);
 void printGenes(Genotype genotype, int citiesPerSalesman, int rank, int iteration);
 vector<int> getRandomInts(int endRange, int exception, int count);
 
-Algorithm::Algorithm(int salesmen, int cities, int citiesPerSalesman, int populationSize, Graph* graph) {
+Algorithm::Algorithm(int salesmen, int cities, int citiesPerSalesman, int populationSize, Graph* graph, double mutationRatio) {
 	assert(salesmen * citiesPerSalesman == cities);
 	this->salesmen = salesmen;
 	this->cities = cities;
 	this->citiesPerSalesman = citiesPerSalesman;
 	this->populationSize = populationSize;
 	this->graph = graph;
+	this->mutationRatio = mutationRatio;
 }
 
-void Algorithm::initializePopulation() {
+void Algorithm::initializePopulation(int iteration, int rank) {
 
 	for (size_t i = 0; i < populationSize; i++) {
 		Genotype genotype = getRandomGenotype();
-		//genotype.printGenotype();
-		population.push_back(genotype);
+		printGenes(genotype, citiesPerSalesman, rank, -1);
+		if (!vectorContains(population, genotype)) {
+			population.push_back(genotype);
+		}
 	}
 }
 
@@ -45,8 +50,6 @@ Genotype Algorithm::getRandomGenotype() {
 
 
 void Algorithm::executeAlgorithm() {
-
-
 	int numtask, rank;
 	int participants;
 	int dataLength = cities + 1;
@@ -63,8 +66,9 @@ void Algorithm::executeAlgorithm() {
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	srand((int)time(NULL) + rank * 10000);
-	initializePopulation();
+
 	int iteration = 0;
+	initializePopulation(iteration, rank);
 
 	if (numtask >= MAX_PROCESSES) {
 		fprintf(stderr, "Max number of threads is %d\n", MAX_PROCESSES); fflush(stderr);
@@ -79,12 +83,15 @@ void Algorithm::executeAlgorithm() {
 	int send_count = dataLength;
 	int recv_count = dataLength;
 
-	while (iteration < 8) {
+	while (iteration < 280) {
 		vector<pair<int, int>> indices = getParentPairs();
 		for (size_t i = 0; i < indices.size(); i++) {
 			Genotype genotype1 = population[indices[i].first];
 			Genotype genotype2 = population[indices[i].second];
 			makeCrossover(genotype1, genotype2);
+		}
+		if (shouldPerformMutation()) {
+			performMutation();
 		}
 		vector<Genotype> newP = getNewPopulation(population);
 		cout << "#" << rank << " iteration: " << iteration << endl;;
@@ -99,7 +106,7 @@ void Algorithm::executeAlgorithm() {
 		Genotype bestGenotype = newP[0];
 		cout << "#" << rank << " iteration: " << iteration << "; begin_row: " << begin_row << ", end_row:" << end_row << ", blocksize" << block_size << ", sendcount: " << send_count << endl;
 		for (int i = begin_row; i < end_row; i++) {
-			for (int j = 0; j < dataLength-1; j++) {
+			for (int j = 0; j < dataLength - 1; j++) {
 				table[i][j] = bestGenotype.getAllGenes()[j].getGenes();
 			}
 			table[i][dataLength - 1] = bestGenotype.getRate();
@@ -108,7 +115,7 @@ void Algorithm::executeAlgorithm() {
 		MPI_Allgather(&table[begin_row][0], send_count, MPI_INT,
 			&table[0][0], recv_count, MPI_INT, MPI_COMM_WORLD);
 
-		
+
 		MPI_Barrier(MPI_COMM_WORLD);
 
 		if (iteration % 3 == 2) {
@@ -167,8 +174,28 @@ void Algorithm::executeAlgorithm() {
 			cout << "Iteration: " << i << ", best gene rate: " << bestGenotypesInIterations[i] << endl;
 		}
 	}
-	
+
 	MPI_Finalize();
+}
+
+bool Algorithm::shouldPerformMutation() {
+	double val = (double)rand() / RAND_MAX;
+	return (val < mutationRatio);
+}
+
+void Algorithm::performMutation() {
+	int populationId = rand() % populationSize;
+	Genotype genotypeToMutate = population[populationId];
+	int firstGeneId = rand() % cities;
+	int secondGeneId = rand() % (cities - 1);
+	if (secondGeneId >= firstGeneId) {
+		secondGeneId++;
+	}
+	vector<CityGene> mutatedGenes = genotypeToMutate.getAllGenes();
+	CityGene tmp = mutatedGenes[firstGeneId];
+	mutatedGenes[firstGeneId] = mutatedGenes[secondGeneId];
+	mutatedGenes[secondGeneId] = tmp;
+	Genotype mutatedGenotype = Genotype(mutatedGenes, citiesPerSalesman);
 }
 
 void Algorithm::makeCrossover(Genotype genotype1, Genotype genotype2) {
@@ -248,10 +275,26 @@ vector<Genotype> Algorithm::getNewPopulation(std::vector<Genotype> temporaryPopu
 }
 
 vector<Genotype> Algorithm::cutPopulation(std::vector<Genotype> temporaryPopulation) {
-	vector<Genotype> tmp = temporaryPopulation;
+	vector<Genotype> tmp = deleteDuplicates(temporaryPopulation);
 	sort(tmp.begin(), tmp.end());
 	tmp.resize(populationSize);
 	return tmp;
+}
+
+vector<Genotype> Algorithm::deleteDuplicates(vector<Genotype> population) {
+	vector<Genotype> cutPopulation;
+	for (int i = 0; i < population.size(); i++) {
+		bool isDup = false;
+		for (int j = i + 1; j < population.size(); j++) {
+			if (population[i] == population[j]) {
+				isDup = true;
+			}
+		}
+		if (!isDup) {
+			cutPopulation.push_back(population[i]);
+		}
+	}
+	return cutPopulation;
 }
 
 float Algorithm::rateGenotype(Genotype genotype) {
@@ -334,7 +377,7 @@ void printGenes(vector<CityGene> genes, int citiesPerSalesman) {
 		}
 		cout << " " << genes[i].getGenes();
 		if (i % citiesPerSalesman == citiesPerSalesman - 1) {
-			cout << "] ";
+			cout << "]";
 		}
 		else {
 			cout << ",";
@@ -366,6 +409,16 @@ void printGenes(Genotype genotype, int citiesPerSalesman, int rank, int iteratio
 bool vectorContains(vector<CityGene> vec, CityGene value) {
 	for (size_t i = 0; i < vec.size(); i++) {
 		if (vec[i].getGenes() == value.getGenes()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool vectorContains(vector<Genotype> vec, Genotype value) {
+	for (int i = 0; i < vec.size(); i++) {
+		//cout << "vectorContains: " << vec[i] << " vs " << value << ",		res: " << (vec[i] == value) << endl;
+		if (vec[i] == value) {
 			return true;
 		}
 	}

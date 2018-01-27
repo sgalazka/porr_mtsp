@@ -5,11 +5,8 @@
 class Graph {
 private:
 	igraph_t* g;
-	igraph_vector_t* edges;
-
-
 public:
-	Graph(int noOfVertices, igraph_vector_t* edges);
+	Graph(char* filename);
 	Graph();
 	~Graph();
 	std::vector<int> getPath(int startIndex, int endIndex);

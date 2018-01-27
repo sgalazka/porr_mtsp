@@ -4,16 +4,20 @@
 
 class Genotype {
 private:
-	std::vector<CityGene> genes;
-	int citiesPerSalesman;
 	float rate;
 public:
+	int citiesPerSalesman;
+	std::vector<CityGene> genes;
+
 	Genotype();
 	Genotype(std::vector<CityGene> g, int citiesPerSalesman);
-	std::vector<CityGene> getAllGenes();
+	std::vector<CityGene> getAllGenes() const;
 	void printGenotype();
 	std::vector<CityGene> getGenesForSalesman(int id);
 	void setRate(float rate);
 	float getRate();
 	bool operator < (const Genotype& str) const;
+	bool operator==(const Genotype &g) const;
+
+	friend std::ostream& operator<<(std::ostream &strm, const Genotype &a);
 };

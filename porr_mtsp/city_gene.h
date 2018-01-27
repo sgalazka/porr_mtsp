@@ -5,6 +5,7 @@ private:
 	int genes;
 
 public:
-	int getGenes();
+	int getGenes() const;
 	CityGene(int genes);
+	bool operator==(const CityGene &c);
 };

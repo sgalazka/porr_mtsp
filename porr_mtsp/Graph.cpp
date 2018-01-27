@@ -4,29 +4,13 @@
 #include <assert.h>
 
 
-Graph::Graph(int noOfVertices, igraph_vector_t* edges1) {
+Graph::Graph(char* filename) {
 	this->g = new igraph_t;
-	//igraph_create(this->g, edges1, 8, 0);
-
-	/*igraph_barabasi_game((this->g),
-		11,
-		1, //power
-		2,
-		0,
-		0,
-		1, //A
-		0,
-		IGRAPH_BARABASI_BAG,
-		0//start_from
-		);
-	igraph_write_graph_gml(this->g, stdout, NULL, 0);*/
-
-
 	FILE *file;
-	file = fopen("graph.gml", "r");
+	file = fopen(filename, "r");
 	assert(file != 0);
 	igraph_read_graph_gml(this->g, file);
-	this->edges = edges1;
+	
 }
 
 Graph::Graph() {

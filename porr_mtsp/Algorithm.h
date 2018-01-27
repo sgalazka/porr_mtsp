@@ -14,10 +14,11 @@ private:
 	int citiesPerSalesman;
 	int populationSize;
 	Graph* graph;
+	double mutationRatio;
 	std::vector<Genotype> population;
 public:
-	Algorithm(int salesmen, int cities, int citiesPerSalesman, int populationSize, Graph* graph);
-	void initializePopulation();
+	Algorithm(int salesmen, int cities, int citiesPerSalesman, int populationSize, Graph* graph, double mutationRatio);
+	void initializePopulation(int iteration, int rank);
 	void executeAlgorithm();
 	Genotype getRandomGenotype();
 	void orderCrossover(std::vector<CityGene>* parent1, std::vector<CityGene>* parent2,
@@ -28,5 +29,8 @@ public:
 	std::vector<std::pair<int, int>> getParentPairs();
 	void makeCrossover(Genotype genotype1, Genotype genotype2);
 	std::vector<Genotype> cutPopulation(std::vector<Genotype> temporaryPopulation);
+	std::vector<Genotype> deleteDuplicates(std::vector<Genotype> population);
+	bool shouldPerformMutation();
+	void performMutation();
 };
 

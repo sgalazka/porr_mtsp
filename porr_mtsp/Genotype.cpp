@@ -12,7 +12,7 @@ Genotype::Genotype(vector<CityGene> g, int citiesPerSalesman): genes(g), citiesP
 	
 }
 
-vector<CityGene> Genotype::getAllGenes() {
+vector<CityGene> Genotype::getAllGenes() const {
 	return genes;
 }
 
@@ -51,4 +51,30 @@ void Genotype::printGenotype() {
 	}
 
 	cout << endl;
+}
+
+std::ostream& operator<<(std::ostream &strm, const Genotype &a) {
+	for (int i = 0; i < a.genes.size(); i++) {
+		if (i % a.citiesPerSalesman == 0) {
+			strm << " [";
+		}
+		strm << " " << a.genes[i].getGenes();
+		if (i % a.citiesPerSalesman == a.citiesPerSalesman - 1) {
+			strm << "]";
+		}
+		else {
+			strm << ",";
+		}
+	}
+	return strm;
+}
+
+bool Genotype::operator==(const Genotype &g) const {
+	const vector<CityGene> genes = this->getAllGenes();
+	for (int i = 0; i < genes.size(); i++) {
+		if (genes[i].getGenes() != g.getAllGenes()[i].getGenes()) {
+			return false;
+		}
+	}
+	return true;
 }
