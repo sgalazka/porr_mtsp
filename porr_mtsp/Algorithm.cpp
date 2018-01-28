@@ -21,11 +21,10 @@ Algorithm::Algorithm(int salesmen, int cities, int citiesPerSalesman, int popula
 	this->mutationRatio = mutationRatio;
 }
 
-void Algorithm::initializePopulation(int iteration, int rank) {
+void Algorithm::initializePopulation() {
 
 	for (size_t i = 0; i < populationSize; i++) {
 		Genotype genotype = getRandomGenotype();
-		printGenes(genotype, citiesPerSalesman, rank, -1);
 		if (!vectorContains(population, genotype)) {
 			population.push_back(genotype);
 		}
@@ -48,12 +47,45 @@ Genotype Algorithm::getRandomGenotype() {
 	return g;
 }
 
+void Algorithm::executeSequence() {
 
-void Algorithm::executeAlgorithm() {
+	vector<int> bestGenotypesInIterations;
+
+	srand((int)time(NULL));
+
+	int iteration = 0;
+	initializePopulation();
+
+	while (iteration < 280) {
+		vector<pair<int, int>> indices = getParentPairs();
+		for (size_t i = 0; i < indices.size(); i++) {
+			Genotype genotype1 = population[indices[i].first];
+			Genotype genotype2 = population[indices[i].second];
+			makeCrossover(genotype1, genotype2);
+		}
+		if (shouldPerformMutation()) {
+			performMutation();
+		}
+		vector<Genotype> newP = getNewPopulation(population);
+		for (size_t i = 0; i < newP.size(); i++)
+		{
+			printGenes(newP[i].getAllGenes(), citiesPerSalesman);
+		}
+		cout << endl;
+		population = newP;
+		iteration++;
+	}
+	cout << "max iteration: " << iteration << endl;
+	for (int i = 0; i < iteration; i++) {
+		cout << "Iteration: " << i << ", best gene rate: " << bestGenotypesInIterations[i] << endl;
+	}
+}
+
+void Algorithm::executeParallel() {
 	int numtask, rank;
 	int participants;
 	int dataLength = cities + 1;
-	int table[MAX_PROCESSES][11];
+	int table[MAX_PROCESSES][51];
 	vector<int> bestGenotypesInIterations;
 
 	int rc = MPI_Init(NULL, NULL);

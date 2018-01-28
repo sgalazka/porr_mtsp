@@ -18,8 +18,9 @@ private:
 	std::vector<Genotype> population;
 public:
 	Algorithm(int salesmen, int cities, int citiesPerSalesman, int populationSize, Graph* graph, double mutationRatio);
-	void initializePopulation(int iteration, int rank);
-	void executeAlgorithm();
+	void initializePopulation();
+	void executeParallel();
+	void executeSequence();
 	Genotype getRandomGenotype();
 	void orderCrossover(std::vector<CityGene>* parent1, std::vector<CityGene>* parent2,
 		std::vector<CityGene>* child1, std::vector<CityGene>* child2);
