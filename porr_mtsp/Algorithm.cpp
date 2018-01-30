@@ -1,6 +1,8 @@
 #include "Algorithm.h"
 #include <mpi.h>
 #include <math.h>
+#include <Windows.h>
+#include <fstream>
 #define MAX_PROCESSES 20
 
 using namespace std;
@@ -47,9 +49,10 @@ Genotype Algorithm::getRandomGenotype() {
 	return g;
 }
 
-void Algorithm::executeSequence() {
+vector<Result> Algorithm::executeSequence() {
+	long start = GetTickCount();
 
-	vector<int> bestGenotypesInIterations;
+	vector<Result> bestGenotypesInIterations;
 
 	srand((int)time(NULL));
 
@@ -71,36 +74,33 @@ void Algorithm::executeSequence() {
 		{
 			printGenes(newP[i].getAllGenes(), citiesPerSalesman);
 		}
+		Result result;
+		result.bestGenotypeRate = newP[0].getRate();
+		result.milis = GetTickCount() - start;
+		bestGenotypesInIterations.push_back(result);
 		cout << endl;
 		population = newP;
 		iteration++;
 	}
-	cout << "max iteration: " << iteration << endl;
-	for (int i = 0; i < iteration; i++) {
-		cout << "Iteration: " << i << ", best gene rate: " << bestGenotypesInIterations[i] << endl;
-	}
+	return bestGenotypesInIterations;
 }
 
-void Algorithm::executeParallel() {
+vector<Result> Algorithm::executeParallel() {
+	long startTime = GetTickCount();
 	int numtask, rank;
 	int participants;
 	int dataLength = cities + 1;
-	int table[MAX_PROCESSES][51];
-	vector<int> bestGenotypesInIterations;
+	int table[MAX_PROCESSES][25];
+	vector<Result> bestGenotypesInIterations;
 
-	int rc = MPI_Init(NULL, NULL);
-	if (rc != MPI_SUCCESS)
-	{
-		printf("Error");
-		MPI_Abort(MPI_COMM_WORLD, rc);
-	}
+	
 	MPI_Comm_size(MPI_COMM_WORLD, &numtask);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	srand((int)time(NULL) + rank * 10000);
 
 	int iteration = 0;
-	initializePopulation(iteration, rank);
+	initializePopulation();
 
 	if (numtask >= MAX_PROCESSES) {
 		fprintf(stderr, "Max number of threads is %d\n", MAX_PROCESSES); fflush(stderr);
@@ -115,7 +115,7 @@ void Algorithm::executeParallel() {
 	int send_count = dataLength;
 	int recv_count = dataLength;
 
-	while (iteration < 280) {
+	while (iteration < 190) {
 		vector<pair<int, int>> indices = getParentPairs();
 		for (size_t i = 0; i < indices.size(); i++) {
 			Genotype genotype1 = population[indices[i].first];
@@ -193,7 +193,10 @@ void Algorithm::executeParallel() {
 					bestGeneRate = geneRate;
 				}
 			}
-			bestGenotypesInIterations.push_back(bestGeneRate);
+			Result result;
+			result.bestGenotypeRate = bestGeneRate;
+			result.milis = GetTickCount() - startTime;
+			bestGenotypesInIterations.push_back(result);
 		}
 
 		MPI_Barrier(MPI_COMM_WORLD);
@@ -203,11 +206,12 @@ void Algorithm::executeParallel() {
 	if (rank == 0) {
 		cout << "max iteration: " << iteration << endl;
 		for (int i = 0; i < iteration; i++) {
-			cout << "Iteration: " << i << ", best gene rate: " << bestGenotypesInIterations[i] << endl;
+			cout << "Iteration: " << i << ", best gene rate: " << bestGenotypesInIterations[i].bestGenotypeRate << endl;
 		}
 	}
 
-	MPI_Finalize();
+	
+	return bestGenotypesInIterations;
 }
 
 bool Algorithm::shouldPerformMutation() {
@@ -468,4 +472,18 @@ vector<int> getRandomInts(int endRange, int exception, int count) {
 	random_shuffle(&ids[0], &ids[0] + endRange - 1);
 	ids.resize(count);
 	return ids;
+}
+
+void Algorithm::writeResultsToFile(vector<Result> results, bool isSequence) {
+	ofstream file;
+	file.open("log.txt", ios::app);
+	if (file.is_open()) {
+		file << "isSequence: " << isSequence << ", cities:" << cities << ", salesmen:" << salesmen
+			<< ", citiesPerSalesman:" << citiesPerSalesman << ", populationSize:" << populationSize
+			<< ", mutationRatio: " << mutationRatio << endl;
+		for (int i = 0; i < 280; i++) {
+			file << "\t" << i << "\t" << results[i].bestGenotypeRate << "\t" << results[i].milis << endl;
+		}
+		file.close();
+	}
 }

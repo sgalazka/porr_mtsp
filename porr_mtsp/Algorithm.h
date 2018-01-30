@@ -7,6 +7,11 @@
 #include <algorithm>
 #include <assert.h>
 
+struct Result {
+	long milis;
+	int bestGenotypeRate;
+};
+
 class Algorithm {
 private:
 	int salesmen;
@@ -19,8 +24,8 @@ private:
 public:
 	Algorithm(int salesmen, int cities, int citiesPerSalesman, int populationSize, Graph* graph, double mutationRatio);
 	void initializePopulation();
-	void executeParallel();
-	void executeSequence();
+	std::vector<Result> executeParallel();
+	std::vector<Result> executeSequence();
 	Genotype getRandomGenotype();
 	void orderCrossover(std::vector<CityGene>* parent1, std::vector<CityGene>* parent2,
 		std::vector<CityGene>* child1, std::vector<CityGene>* child2);
@@ -33,5 +38,6 @@ public:
 	std::vector<Genotype> deleteDuplicates(std::vector<Genotype> population);
 	bool shouldPerformMutation();
 	void performMutation();
+	void writeResultsToFile(std::vector<Result> results, bool isSequence);
 };
 
